@@ -13,6 +13,7 @@ function iconic_one_excerpts() { ?>
 			<?php endif;?>
 		</div>
 			<?php the_excerpt(); ?>
+			<a href="<?php echo get_permalink(); ?>"> Read More »</a>
 		</div><!-- .entry-summary -->
 		<?php }
 

@@ -148,6 +148,16 @@ $wp_customize->add_control(new Social_Textarea_Control($wp_customize, 'twitter_u
 $wp_customize->add_section('sl_content' , array(
 	'priority'    => 600,
 ));
+$wp_customize->add_setting('youtube_url', array('default' => 'http://youtube.com/', 'sanitize_callback' => 'iconic_one_sanitize_text',));
+$wp_customize->add_control(new Social_Textarea_Control($wp_customize, 'youtube_url', array(
+	'label' => 'Youtube url',
+	'section' => 'sl_content',
+	'settings' => 'youtube_url',
+)));
+
+$wp_customize->add_section('sl_content' , array(
+	'priority'    => 600,
+));
 $wp_customize->add_setting('facebook_url', array('default' => 'http://facebook.com/', 'sanitize_callback' => 'iconic_one_sanitize_text',));
 $wp_customize->add_control(new Social_Textarea_Control($wp_customize, 'facebook_url', array(
 	'label' => 'Facebook url',

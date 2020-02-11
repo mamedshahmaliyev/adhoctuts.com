@@ -51,6 +51,9 @@
 			<?php if( get_theme_mod( 'rss_url' ) !== '' ) { ?>
 			<a class="rss" href="<?php echo esc_url( get_theme_mod( 'rss_url', 'default_value' ) ); ?>" target="_blank"><img src="<?php echo get_template_directory_uri(); ?>/img/rss.png" alt="Follow us on rss"/></a>			
 			<?php } ?>
+			<?php if( get_theme_mod( 'youtube_url' ) !== '' ) { ?>
+			<a class="rss" href="<?php echo esc_url( get_theme_mod( 'youtube_url', 'default_value' ) ); ?>" target="_blank"><img src="<?php echo get_template_directory_uri(); ?>/img/youtube.png" alt="Follow us on youtube"/></a>			
+			<?php } ?>
 		</div>
 	<?php } ?>	
 
