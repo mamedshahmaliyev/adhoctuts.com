@@ -2,7 +2,9 @@
 
 namespace EmbedPress\Providers;
 
-use Embera\Adapters\Service as EmberaService;
+use Embera\Provider\ProviderAdapter;
+use Embera\Provider\ProviderInterface;
+use Embera\Url;
 
 (defined('ABSPATH') && defined('EMBEDPRESS_IS_LOADED')) or die("No direct script access allowed.");
 
@@ -12,23 +14,24 @@ use Embera\Adapters\Service as EmberaService;
  * @package     EmbedPress
  * @subpackage  EmbedPress/Providers
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.0.0
  */
-class GoogleDocs extends EmberaService
+class GoogleDocs extends ProviderAdapter implements ProviderInterface
 {
     /**
      * Method that verifies if the embed URL belongs to GoogleDocs.
      *
+     * @param Url $url
+     * @return  boolean
      * @since   1.0.0
      *
-     * @return  boolean
      */
-    public function validateUrl()
+    public function validateUrl(Url $url)
     {
-        return preg_match('~http[s]?:\/\/((?:www\.)?docs\.google\.com\/(?:.*/)?(?:document|presentation|spreadsheets|forms|drawings)\/[a-z0-9\/\?=_\-\.\,&%\$#\@\!\+]*)~i',
-            $this->url);
+        return (bool) preg_match('~http[s]?:\/\/((?:www\.)?docs\.google\.com\/(?:.*/)?(?:document|presentation|spreadsheets|forms|drawings)\/[a-z0-9\/\?=_\-\.\,&%\$#\@\!\+]*)~i',
+            $url);
     }
 
     /**
@@ -101,10 +104,15 @@ class GoogleDocs extends EmberaService
                 break;
         }
 
+
+	    $width = isset( $this->config['maxwidth']) ? $this->config['maxwidth']: 600;
+	    $height = isset( $this->config['maxheight']) ? $this->config['maxheight']: 450;
         if ($type !== 'drawings') {
-            $html = '<iframe src="' . $iframeSrc . '" frameborder="0" width="600" height="450" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>';
+            $html = '<iframe src="' . $iframeSrc . '" frameborder="0" width="'.$width.'" height="'.$height.'" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>';
         } else {
-            $html = '<img src="' . $iframeSrc . '" width="960" height="720" />';
+	        $width = isset( $this->config['maxwidth']) ? $this->config['maxwidth']: 960;
+	        $height = isset( $this->config['maxheight']) ? $this->config['maxheight']: 720;
+            $html = '<img src="' . $iframeSrc . '" width="'.$width.'" height="'.$height.'" />';
         }
 
         return [
@@ -115,5 +123,11 @@ class GoogleDocs extends EmberaService
             'html'          => $html,
             'wrapper_class' => 'ose-google-docs-' . $type,
         ];
+    }
+
+    /** inline @inheritDoc */
+    public function modifyResponse( array $response = [])
+    {
+        return $this->fakeResponse();
     }
 }

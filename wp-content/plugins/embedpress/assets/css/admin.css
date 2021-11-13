@@ -65,6 +65,11 @@
     margin-top: 15px;
 }
 
+#embedpress-settings-wrapper > header {
+    display: flex;
+    justify-content: space-between;
+}
+
 #embedpress-settings-wrapper > header .pressshack-title {
     display: inline-block;
     padding: 10px 0 10px 55px;
@@ -204,16 +209,19 @@
 }
 
 #embedpress-settings-wrapper .button-primary {
-    background-color: #FFB300;
-    border-color: #C58C07;
-    color: #754D26;
-}
-
-#embedpress-settings-wrapper .button-primary:hover,
-#embedpress-settings-wrapper .button-primary:active,
-#embedpress-settings-wrapper .button-primary:focus {
-    background-color: #F3AC04;
-    color: #333;
+    line-height: 1;
+    border: none;
+    border-radius: 0;
+    background-color: #dc4444;
+    color: #ffffff;
+    font-size: 14px;
+    width: 150px;
+    height: 38px;
+    border-radius: 5px;
+    transition: all .3s;
+    text-shadow: none;
+    box-shadow: none;
+    margin: 0;
 }
 
 #embedpress-settings-wrapper button:not(.notice-dismiss).button-secondary {
@@ -261,8 +269,111 @@
     color: #655997;
 }
 
+.embedpress-col-half {
+    width: 49%;
+    height: auto;
+}
+
+.embedpress-admin-block-wrapper {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    margin: -10px;
+}
+
+.embedpress-admin-block-wrapper .embedpress-admin-block {
+    background-color: #fff;
+    flex: 1 1 auto;
+    min-width: 250px;
+    width: 300px;
+    margin: 10px 10px 25px 10px;
+    box-shadow: 0px 8px 38px 0px rgba(16, 16, 16, 0.07);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.embedpress-admin-block-header {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    padding: 30px 0 0 25px;
+}
+
+.embedpress-admin-block-header-icon {
+    height: 40px;
+    width: 40px;
+    background: #f3edff;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 50%;
+}
+
+.embedpress-go-premium img {
+    width: 100%;
+    max-width: 400px;
+    display: block;
+    float: right;
+}
+
+.embedpress-admin-block-header .embedpress-admin-title {
+    margin: 0.7em 0 1em;
+    padding: 0 1.26582em;
+    font-size: 15px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #333333;
+}
+
+.embedpress-go-premium .embedpress-admin-block-content {
+    overflow: hidden;
+    position: relative;
+    padding: 1em 1.5em 1.5em;
+    background-color: #fff;
+    padding-left: 85px;
+    padding-bottom: 30px;
+    padding-top: 0px;
+}
+
+.embedpress-admin-block-content p {
+    font-size: 13px;
+    color: #707070;
+    margin: 0px 0 20px 0;
+    line-height: 21px;
+}
+
+.embedpress-go-premium .embedpress-btn:hover,
+.embedpress-go-premium .embedpress-btn {
+    background-color: #0099cc;
+    color: #fff !important;
+    padding: 6px 20px;
+    border: none;
+    box-shadow: none;
+    font-size: 14px;
+    height: auto;
+    text-transform: uppercase;
+    text-shadow: none;
+    letter-spacing: 0.05em;
+}
+
 .modal-dialog .row {
     width: 100%;
+}
+
+.embedpress-version-name {
+    vertical-align: middle;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+.embedpress-version-name span{
+    color: #687b95;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: right;
+    display: block;
+    padding-bottom: 5px;
 }
 
 
@@ -273,4 +384,109 @@
 #piframe,
 .fs-secure-notice {
     display: none;
+}
+
+/**
+* Notice
+**/
+
+.wpdeveloper-review-notice {
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 3px;
+    margin: 15px;
+    border-left: 4px solid transparent;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.wpdeveloper-review-notice:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.wpdeveloper-notice-thumbnail {
+    width: 90px;
+    float: left;
+    padding: 5px;
+    text-align: center;
+    border-right: 4px solid transparent;
+}
+.wpdeveloper-notice-thumbnail img {
+    width: 72px;
+    opacity: 0.85;
+    -webkit-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+.wpdeveloper-notice-thumbnail img:hover {
+    opacity: 1;
+}
+
+.wpdeveloper-notice-link {
+    margin: 8px 0 0 0;
+    padding: 0;
+}
+.wpdeveloper-notice-link li {
+    display: inline-block;
+    margin-right: 15px;
+}
+.wpdeveloper-notice-link li a {
+    display: inline-block;
+    color: #10738b;
+    text-decoration: none;
+    padding-left: 26px;
+    position: relative;
+}
+.wpdeveloper-notice-link li a span {
+    position: absolute;
+    left: 0;
+    top: -2px;
+}
+.wpdeveloper-notice-message {
+    padding: 10px 0;
+}
+.wpdeveloper-upsale-notice .wpdeveloper-notice-message {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 10px 0;
+}
+.wpdeveloper-upsale-notice .wpdeveloper-notice-message + .notice-dismiss {
+    top: 10px;
+}
+.wpdeveloper-upsale-notice #plugin-install-core {
+    margin-left: 10px;
+}
+.notice.notice-has-thumbnail {
+    padding-left: 0;
+}
+.wpdeveloper-upsale-notice {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+.wpdeveloper-upsale-notice .wpdeveloper-notice-thumbnail {
+    padding: 10px;
+    width: 40px;
+}
+.wpdeveloper-upsale-notice .wpdeveloper-notice-thumbnail img {
+    width: 32px;
+}
+.toplevel_page_eael-settings .wp-menu-image img {
+    max-width: 20px;
+    padding-top: 8px !important;
+}
+.wpdeveloper-upsale-notice .wpdeveloper-notice-message .button {
+    margin-left: 15px;
+}
+
+#embedpress-settings-wrapper a.embedpress-settings-link {
+    color: #0073aa;
 }

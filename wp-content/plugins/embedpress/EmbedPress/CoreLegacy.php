@@ -12,12 +12,13 @@ use EmbedPress\Ends\Front\Handler as EndHandlerPublic;
  *
  * @package     EmbedPress
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.0.0
  */
 class CoreLegacy
 {
+    use \EmbedPress\Includes\Traits\Shared;
     /**
      * The name of the plugin.
      *
@@ -40,11 +41,9 @@ class CoreLegacy
 
     /**
      * An instance of the plugin loader.
-     *
      * @since   1.0.0
      * @access  protected
-     *
-     * @var     \EmbedPress\Loader $pluginVersion The version of the plugin.
+     * @var     Loader $pluginVersion The version of the plugin.
      */
     protected $loaderInstance;
 
@@ -72,6 +71,7 @@ class CoreLegacy
         $this->pluginVersion = EMBEDPRESS_VERSION;
 
         $this->loaderInstance = new Loader();
+        add_action('admin_notices',[$this,'embedpress_admin_notice']);
     }
 
     /**
@@ -103,9 +103,9 @@ class CoreLegacy
      *
      * @since   1.0.0
      *
-     * @return  \EmbedPress\Loader
+     * @return  Loader
      */
-    public function getLoader()
+	public function getLoader()
     {
         return $this->loaderInstance;
     }
@@ -123,7 +123,7 @@ class CoreLegacy
 
         if (is_admin()) {
             $plgSettings = self::getSettings();
-
+            $this->admin_notice();
             $settingsClassNamespace = '\\EmbedPress\\Ends\\Back\\Settings';
             add_action('admin_menu', [$settingsClassNamespace, 'registerMenuItem']);
             add_action('admin_init', [$settingsClassNamespace, 'registerActions']);
@@ -133,6 +133,7 @@ class CoreLegacy
                 ['\\EmbedPress\\CoreLegacy', 'handleActionLinks'], 10, 2);
 
             add_action('admin_enqueue_scripts', ['\\EmbedPress\\Ends\\Back\\Handler', 'enqueueStyles']);
+            add_action('wp_ajax_embedpress_notice_dismiss', ['\\EmbedPress\\Ends\\Back\\Handler', 'embedpress_notice_dismiss']);
 
             add_action('init', ['\\EmbedPress\\DisablerLegacy', 'run'], 1);
             add_action('init', [$this, 'configureTinyMCE'], 1);
@@ -171,6 +172,7 @@ class CoreLegacy
         add_filter('fl_builder_before_render_shortcodes',
             ['\\EmbedPress\\ThirdParty\\BeaverBuilder', 'before_render_shortcodes']);
 
+        $this->start_plugin_tracking();
         $this->loaderInstance->run();
     }
 
@@ -236,10 +238,6 @@ class CoreLegacy
      */
     public static function canServiceProviderBeResponsive($serviceProviderAlias)
     {
-        $providers = [
-
-        ];
-
         return in_array($serviceProviderAlias, [
             "dailymotion",
             "kickstarter",

@@ -2,6 +2,11 @@
 
 namespace EmbedPress;
 
+use Embera\Embera;
+use WP_Error as WP_ErrorAlias;
+use WP_REST_Request;
+use WP_REST_Response;
+
 (defined('ABSPATH') && defined('EMBEDPRESS_IS_LOADED')) or die("No direct script access allowed.");
 
 /**
@@ -9,43 +14,34 @@ namespace EmbedPress;
  *
  * @package     EmbedPress
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.0.0
  */
 class RestAPI
 {
     /**
-     * @param \WP_REST_Request $request
+     * @param  WP_REST_Request  $request
+     *
+     * @return WP_REST_Response | WP_ErrorAlias
      */
     public static function oembed($request)
     {
-        $url = sanitize_url($request->get_param('url'));
+        $url = esc_url_raw($request->get_param('url'));
+		$atts = [
+			'width' => intval( $request->get_param('width')),
+			'height' => intval( $request->get_param('height')),
+		];
 
         if (empty($url)) {
-            return new \WP_Error('embedpress_invalid_url', 'Invalid Embed URL', ['status' => 404]);
+            return new WP_ErrorAlias('embedpress_invalid_url', 'Invalid Embed URL', ['status' => 404]);
         }
 
-        $config = [];
-        $embera = new \Embera\Embera($config);
-
-        $additionalServiceProviders = Core::getAdditionalServiceProviders();
-        if ( ! empty($additionalServiceProviders)) {
-            foreach ($additionalServiceProviders as $serviceProviderClassName => $serviceProviderUrls) {
-                Shortcode::addServiceProvider($serviceProviderClassName, $serviceProviderUrls, $embera);
-            }
-        }
-
-        $urlInfo = $embera->getUrlInfo($url);
-        if (isset($urlInfo[$url])) {
-            $urlInfo                     = (object)$urlInfo[$url];
-            $response['canBeResponsive'] = Core::canServiceProviderBeResponsive($urlInfo->provider_alias);
-        }
-
+        $urlInfo = Shortcode::parseContent( $url, true, $atts);
         if (empty($urlInfo)) {
-            return new \WP_Error('embedpress_invalid_url', 'Invalid Embed URL', ['status' => 404]);
+            return new WP_ErrorAlias('embedpress_invalid_url', 'Invalid Embed URL', ['status' => 404]);
         }
 
-        return new \WP_REST_Response($urlInfo, 202);
+        return new WP_REST_Response($urlInfo, 200);
     }
 }

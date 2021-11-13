@@ -238,7 +238,7 @@
 
             self.loadAsyncDynamicJsCodeFromElement = function (subject, wrapper, editorInstance) {
                 subject = $(subject);
-                if (subject.prop('tagName').toLowerCase() === 'script') {
+                if (subject.prop('tagName') && subject.prop('tagName').toLowerCase() === 'script') {
                     var scriptSrc = subject.attr('src') || null;
                     if (!scriptSrc) {
                         self.addScriptDeclaration(wrapper, subject.html(), editorInstance);
@@ -544,7 +544,6 @@
                 // Get the parsed embed code from the EmbedPress plugin
                 self.getParsedContent(url, function getParsedContentCallback (result) {
                     var embeddedContent = (typeof result.data === 'object' ? result.data.embed : result.data).stripShortcode($data.EMBEDPRESS_SHORTCODE);
-
                     var $wrapper = $(self.getElementInContentById('embedpress_wrapper_' + uid, editorInstance));
                     var wrapperParent = $($wrapper.parent());
 
@@ -579,7 +578,7 @@
                         $content.html(embeddedContent);
                     }
 
-                    if (!$('iframe', $content).length) {
+                    if (!$('iframe', $content).length && result.data.provider_name!=='Infogram') {
                         var contentWrapper = $($content).clone();
                         contentWrapper.html('');
 
@@ -696,7 +695,7 @@
                 if (elementsList.length > 0) {
                     $.each(elementsList, function appendElementIntoWrapper (elementIndex, element) {
                         // Check if the element is a script and do not add it now (if added here it wouldn't be executed)
-                        if (element.tagName.toLowerCase() !== 'script') {
+                        if (element.tagName && element.tagName.toLowerCase() !== 'script') {
                             wrapper.append($(element));
 
                             if (element.tagName.toLowerCase() === 'iframe') {
@@ -1295,14 +1294,16 @@
                 if (!embedItem.length) {
                     embedItem = null;
                 }
-
-                $.each($embedInnerWrapper[0].attributes, function () {
-                    if (this.specified) {
-                        if (this.name !== 'class') {
-                            customAttributes[this.name.replace('data-', '').toLowerCase()] = this.value;
+                if ($embedInnerWrapper.length > 1){
+                    $.each($embedInnerWrapper[0].attributes, function () {
+                        if (this.specified) {
+                            if (this.name !== 'class') {
+                                customAttributes[this.name.replace('data-', '').toLowerCase()] = this.value;
+                            }
                         }
-                    }
-                });
+                    });
+                }
+
 
                 var embedWidth = (((embedItem && embedItem.width()) || $embedInnerWrapper.data('width')) || $embedInnerWrapper.width()) || '';
                 var embedHeight = (((embedItem && embedItem.height()) || $embedInnerWrapper.data('height')) || $embedInnerWrapper.height()) || '';

@@ -2,7 +2,9 @@
 
 namespace EmbedPress\Providers;
 
-use Embera\Adapters\Service as EmberaService;
+use Embera\Provider\ProviderAdapter;
+use Embera\Provider\ProviderInterface;
+use Embera\Url;
 
 (defined('ABSPATH') && defined('EMBEDPRESS_IS_LOADED')) or die("No direct script access allowed.");
 
@@ -12,11 +14,11 @@ use Embera\Adapters\Service as EmberaService;
  * @package     EmbedPress
  * @subpackage  EmbedPress/Providers
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.5.0
  */
-class Giphy extends EmberaService
+class Giphy extends ProviderAdapter implements ProviderInterface
 {
     /**
      * The regex which identifies Giphy URLs.
@@ -31,13 +33,14 @@ class Giphy extends EmberaService
     /**
      * Method that verifies if the embed URL belongs to Giphy.
      *
+     * @param Url $url
+     * @return  boolean
      * @since   1.5.0
      *
-     * @return  boolean
      */
-    public function validateUrl()
+    public function validateUrl(Url $url)
     {
-        return preg_match($this->urlRegexPattern, $this->url);
+        return (bool) preg_match($this->urlRegexPattern, (string) $url);
     }
 
     /**
@@ -53,10 +56,10 @@ class Giphy extends EmberaService
 
         if (preg_match($this->urlRegexPattern, $url, $matches)) {
             $gifId = count($matches) > 3 && strtolower($matches[3]) === ".gif" ? $matches[2] : $matches[1];
-
-            $html = '' .
-                    '<a href="https://giphy.com/gifs/' . $gifId . '">' .
-                    '<img src="https://media.giphy.com/media/' . $gifId . '/giphy.gif" alt="" width="{width}" height="{height}">' .
+	        $width = isset( $this->config['maxwidth']) ? $this->config['maxwidth']: 400;
+	        $height = isset( $this->config['maxheight']) ? $this->config['maxheight']: 400;
+            $html = '<a href="https://giphy.com/gifs/' . $gifId . '">' .
+                    '<img src="https://media.giphy.com/media/' . $gifId . '/giphy.gif" alt="" width="'.$width.'" height="'.$height.'">' .
                     '</a>';
 
             $response = [
@@ -71,5 +74,10 @@ class Giphy extends EmberaService
         }
 
         return $response;
+    }
+    /** inline @inheritDoc */
+    public function modifyResponse( array $response = [])
+    {
+        return $this->fakeResponse();
     }
 }

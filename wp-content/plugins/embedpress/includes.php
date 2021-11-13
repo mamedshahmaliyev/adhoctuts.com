@@ -6,13 +6,14 @@ defined('ABSPATH') or die("No direct script access allowed.");
  *
  * @package     EmbedPress
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2021 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.0.0
  */
 
 
 if ( ! defined('EMBEDPRESS')) {
+
     define('EMBEDPRESS', "EmbedPress");
 }
 
@@ -21,11 +22,15 @@ if ( ! defined('EMBEDPRESS_PLG_NAME')) {
 }
 
 if ( ! defined('EMBEDPRESS_VERSION')) {
-    define('EMBEDPRESS_VERSION', "2.3.3");
+    define('EMBEDPRESS_VERSION', "2.7.7");
     /**
      * @deprecated 2.2.0
      */
     define('EMBEDPRESS_PLG_VERSION', EMBEDPRESS_VERSION);
+}
+
+if ( ! defined('EMBEDPRESS_PRO_VERSION')) {
+    define('EMBEDPRESS_PRO_VERSION', "2.4.6");
 }
 
 if ( ! defined('EMBEDPRESS_ROOT')) {
@@ -71,10 +76,6 @@ if ( ! defined('EMBEDPRESS_LICENSES_MORE_INFO_URL')) {
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
-
-// Includes the EDD integration library
-require_once __DIR__ . '/vendor/publishpress/wordpress-edd-license-integration/src/includes.php';
-
 // Run the plugin autoload script
 if ( ! defined('EMBEDPRESS_IS_LOADED')) {
     require_once EMBEDPRESS_PATH_BASE . "autoloader.php";

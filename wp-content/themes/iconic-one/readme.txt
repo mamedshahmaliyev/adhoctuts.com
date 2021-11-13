@@ -1,9 +1,9 @@
 === Iconic One ===
 Contributors: themonic
 Requires at least: WordPress 4.7
-Tested up to: WordPress 5.2.1
+Tested up to: WordPress 5.4.1
 Requires PHP: 5.2.4
-Version: 2.0.1
+Version: 2.1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, two-columns, right-sidebar, custom-background, custom-menu, custom-logo, full-width-template, rtl-language-support, theme-options, custom-colors, flexible-header, translation-ready, news, e-commerce, sticky-post, featured-images, threaded-comments
@@ -22,6 +22,35 @@ Live demo: https://demo.themonic.com/io/
 5. Navigate to Appearance > Customize in your WordPress dashboard to set theme options.
 
 == Changelog ==
+
+
+= 2.1.9=
+* Released: December 24, 2020
+* .webp image support, tested with imagify plugin
+
+= 2.1.8=
+* Released: November 6, 2020
+* Updated screenshot
+* Search button height fix
+
+= 2.1.7=
+* Released: June 29, 2020
+* Backward compatibility for wp_body_open function
+
+= 2.1.6=
+* Released: June 28, 2020
+* Fix: Empty line in extra-functions.php
+
+= 2.1.5=
+* Released: June 27, 2020
+* Added Table widget styles
+* Updated Social icons
+* New: Full width images in mobile view
+* Security update
+
+= 2.1.4=
+* Released: June 06, 2020
+* Woocommerce style fix for single product pages
 
 = 2.1.2=
 * Released: January 17, 2020

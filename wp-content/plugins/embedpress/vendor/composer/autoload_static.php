@@ -4,60 +4,32 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitfa112be3a45897b53eb16b7ddc526d6f
+class ComposerStaticInit892912675c615e61d62bcd5adc416c51
 {
-    public static $files = array (
-        '46a06f2cec651588901bf1ff51ef5979' => __DIR__ . '/..' . '/publishpress/edd-license-handler/EDD_License_Handler.php',
-        '9e7913fda8218537ad84c3389047ab16' => __DIR__ . '/..' . '/publishpress/edd-license-handler/EDD_SL_Plugin_Updater.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
-        'P' => 
+        'E' => 
         array (
-            'PublishPress\\EDD_License\\Core\\' => 30,
-            'PublishPress\\Builder\\' => 21,
-            'Psr\\Container\\' => 14,
+            'Embera\\' => 7,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'PublishPress\\EDD_License\\Core\\' => 
+        'Embera\\' => 
         array (
-            0 => __DIR__ . '/..' . '/publishpress/wordpress-edd-license-integration/src/core',
-        ),
-        'PublishPress\\Builder\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/publishpress/wordpress-plugin-builder/src',
-        ),
-        'Psr\\Container\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/container/src',
+            0 => __DIR__ . '/..' . '/wpdevelopers/embera/src/Embera',
         ),
     );
 
-    public static $prefixesPsr0 = array (
-        'P' => 
-        array (
-            'Pimple' => 
-            array (
-                0 => __DIR__ . '/..' . '/pimple/pimple/src',
-            ),
-        ),
-        'E' => 
-        array (
-            'Embera' => 
-            array (
-                0 => __DIR__ . '/..' . '/ostraining/embera/Lib',
-            ),
-        ),
+    public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitfa112be3a45897b53eb16b7ddc526d6f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitfa112be3a45897b53eb16b7ddc526d6f::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitfa112be3a45897b53eb16b7ddc526d6f::$prefixesPsr0;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit892912675c615e61d62bcd5adc416c51::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit892912675c615e61d62bcd5adc416c51::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit892912675c615e61d62bcd5adc416c51::$classMap;
 
         }, null, ClassLoader::class);
     }

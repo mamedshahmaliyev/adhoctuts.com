@@ -2,7 +2,9 @@
 
 namespace EmbedPress\Providers;
 
-use Embera\Adapters\Service as EmberaService;
+use Embera\Provider\ProviderAdapter;
+use Embera\Provider\ProviderInterface;
+use Embera\Url;
 
 (defined('ABSPATH') && defined('EMBEDPRESS_IS_LOADED')) or die("No direct script access allowed.");
 
@@ -12,11 +14,11 @@ use Embera\Adapters\Service as EmberaService;
  * @package     EmbedPress
  * @subpackage  EmbedPress/Providers
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.5.0
  */
-class Twitch extends EmberaService
+class Twitch extends ProviderAdapter implements ProviderInterface
 {
     /**
      * The regex which identifies Twitch URLs.
@@ -31,13 +33,14 @@ class Twitch extends EmberaService
     /**
      * Method that verifies if the embed URL belongs to Twitch.
      *
+     * @param Url $url
+     * @return  boolean
      * @since   1.5.0
      *
-     * @return  boolean
      */
-    public function validateUrl()
+    public function validateUrl(Url $url)
     {
-        return preg_match($this->urlRegexPattern, $this->url);
+        return (bool) preg_match($this->urlRegexPattern, $this->url);
     }
 
     /**
@@ -75,7 +78,6 @@ class Twitch extends EmberaService
     {
         $url         = $this->getUrl();
         $providerUrl = 'https://twitch.tv';
-        $html        = '';
         $src         = '';
 
         if (preg_match("{$this->urlRegexPattern}i", $url, $matches)) {
@@ -107,10 +109,16 @@ class Twitch extends EmberaService
                     break;
             }
 
-            $html = '<iframe src="' . $src . '" height="{height}" width="{width}" ' . $attrs . '></iframe>';
+            $width = isset( $this->config['maxwidth']) ? $this->config['maxwidth']: 800;
+            $height = isset( $this->config['maxheight']) ? $this->config['maxheight']: 400;
+
+            $pars_url = wp_parse_url(get_site_url());
+            $src = !empty($pars_url['host'])?$src.'&parent='.$pars_url['host']:$src;
+            $html = '<iframe src="' . $src . '" height="'.$height.'" width="'.$width.'" ' . $attrs . '></iframe>';
 
             $response = [
                 'type'          => $type,
+                'content_id'          => $channelName,
                 'provider_name' => 'Twitch',
                 'provider_url'  => $providerUrl,
                 'url'           => $url,
@@ -121,5 +129,10 @@ class Twitch extends EmberaService
         }
 
         return $response;
+    }
+    /** inline @inheritDoc */
+    public function modifyResponse( array $response = [])
+    {
+        return $this->fakeResponse();
     }
 }

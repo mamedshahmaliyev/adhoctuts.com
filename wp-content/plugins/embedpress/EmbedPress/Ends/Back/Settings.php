@@ -2,9 +2,7 @@
 
 namespace EmbedPress\Ends\Back;
 
-use EmbedPress\Compatibility;
-
-(defined('ABSPATH') && defined('EMBEDPRESS_IS_LOADED')) or die("No direct script access allowed.");
+(defined( 'ABSPATH' ) && defined( 'EMBEDPRESS_IS_LOADED' )) or die( "No direct script access allowed." );
 
 /**
  * Entity that handles the plugin's settings page.
@@ -12,12 +10,11 @@ use EmbedPress\Compatibility;
  * @package     EmbedPress
  * @subpackage  EmbedPress/Ends/Back
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.0.0
  */
-class Settings
-{
+class Settings {
     /**
      * This class namespace.
      *
@@ -67,8 +64,7 @@ class Settings
      *
      * @since   1.0.0
      */
-    public function __construct()
-    {
+    public function __construct() {
     }
 
     /**
@@ -76,8 +72,7 @@ class Settings
      *
      * @since   1.0.0
      */
-    public function __clone()
-    {
+    public function __clone() {
     }
 
     /**
@@ -86,10 +81,9 @@ class Settings
      * @since   1.0.0
      * @static
      */
-    public static function registerMenuItem()
-    {
-        add_menu_page('EmbedPress Settings', 'EmbedPress', 'manage_options', 'embedpress',
-            [self::$namespace, 'renderForm'], null, 64);
+    public static function registerMenuItem() {
+        add_menu_page( __('EmbedPress Settings', 'embedpress'), 'EmbedPress', 'manage_options', 'embedpress',
+            [ self::$namespace, 'renderForm' ], null, 64 );
     }
 
     /**
@@ -98,93 +92,64 @@ class Settings
      * @since   1.0.0
      * @static
      */
-    public static function registerActions()
-    {
-        $activeTab = isset($_GET['tab']) ? strtolower($_GET['tab']) : "";
-        if ($activeTab !== "embedpress") {
-            $action = "embedpress:{$activeTab}:settings:register";
-        } else {
-            $activeTab = "";
-        }
-
-        if ( ! empty($activeTab) && has_action($action)) {
-            do_action($action, [
+    public static function registerActions() {
+        $activeTab = isset( $_GET['tab'] ) ? strtolower( $_GET['tab'] ) : "";
+	    $action = ( $activeTab !== "embedpress" ) ? "embedpress:{$activeTab}:settings:register" : '';
+	    if ( !empty( $activeTab ) && has_action( $action ) ) {
+            do_action( $action, [
                 'id'   => self::$sectionAdminIdentifier,
                 'slug' => self::$identifier,
-            ]);
-        } else {
-            register_setting(self::$sectionGroupIdentifier, self::$sectionGroupIdentifier,
-                [self::$namespace, "validateForm"]);
-
-            add_settings_section(self::$sectionAdminIdentifier, '', null, self::$identifier);
-
-            $fieldMap = [];
-            if ( ! Compatibility::isWordPress5() || Compatibility::isClassicalEditorActive()) {
-                $fieldMap = [
-                    'enablePluginInAdmin' => [
-                        'label'   => "Load previews in the admin editor",
-                        'section' => "admin",
-                    ],
-                    'enablePluginInFront' => [
-                        'label'   => "Load previews in the frontend editor",
-                        'section' => "admin",
-                    ],
-                ];
-            }
-
-            $fieldMap['forceFacebookLanguage'] = [
-                'label'   => "Facebook embed language",
-                'section' => "admin",
-            ];
-
-            foreach ($fieldMap as $fieldName => $field) {
-                add_settings_field($fieldName, $field['label'], [self::$namespace, "renderField_{$fieldName}"],
-                    self::$identifier, self::${"section" . ucfirst($field['section']) . "Identifier"});
-            }
+            ] );
         }
     }
 
     /**
      * Returns true if the plugin is active
      *
-     * @param  string $plugin
+     * @param string $plugin
      *
      * @return boolean
      */
-    protected static function is_plugin_active($plugin)
-    {
-        return is_plugin_active("{$plugin}/{$plugin}.php");
+    protected static function is_plugin_active( $plugin ) {
+        return is_plugin_active( "{$plugin}/{$plugin}.php" );
     }
 
     /**
      * Returns true if the plugin is installed
      *
-     * @param  string $plugin
+     * @param string $plugin
      *
      * @return boolean
      */
-    protected static function is_plugin_installed($plugin)
-    {
-        return file_exists(plugin_dir_path(EMBEDPRESS_ROOT) . "{$plugin}/{$plugin}.php");
+    protected static function is_plugin_installed( $plugin ) {
+        return file_exists( plugin_dir_path( EMBEDPRESS_ROOT ) . "{$plugin}/{$plugin}.php" );
     }
 
     /**
-     * Method that render the settings's form.
+     * Method that render the settings form.
      *
      * @since   1.0.0
      * @static
      */
-    public static function renderForm()
-    {
+    public static function renderForm() {
         // Add the color picker css file
-        wp_enqueue_style('wp-color-picker');
+        wp_enqueue_style( 'wp-color-picker' );
         // Include our custom jQuery file with WordPress Color Picker dependency
-        wp_enqueue_script('ep-settings', EMBEDPRESS_URL_ASSETS . 'js/settings.js', ['wp-color-picker'],
-            EMBEDPRESS_VERSION, true);
+        wp_enqueue_script( 'ep-settings', EMBEDPRESS_URL_ASSETS . 'js/settings.js', [ 'wp-color-picker' ],
+            EMBEDPRESS_VERSION, true );
 
-        $activeTab                  = isset($_GET['tab']) ? strtolower($_GET['tab']) : "";
-        $settingsFieldsIdentifier   = ! empty($activeTab) ? "embedpress:{$activeTab}" : self::$sectionGroupIdentifier;
-        $settingsSectionsIdentifier = ! empty($activeTab) ? "embedpress:{$activeTab}" : self::$identifier;
+        $activeTab                  = isset( $_GET['tab'] ) ? strtolower( $_GET['tab'] ) : "";
+        $is_upgrade_tab_active = ($activeTab === 'embedpress_get_pro' || empty( $activeTab )) && !defined( 'EMBEDPRESS_PRO_PLUGIN_VERSION' );
+        $is_license_tab_active = ($activeTab === 'embedpress_license' || empty( $activeTab )) && defined( 'EMBEDPRESS_PRO_PLUGIN_VERSION' );
+        $settingsFieldsIdentifier   = !empty( $activeTab ) ? "embedpress:{$activeTab}" : self::$sectionGroupIdentifier;
+        $settingsSectionsIdentifier = !empty( $activeTab ) ? "embedpress:{$activeTab}" : self::$identifier;
+        $five_stars = `
+<span class="dashicons dashicons-star-filled"></span>
+<span class="dashicons dashicons-star-filled"></span>
+<span class="dashicons dashicons-star-filled"></span>
+<span class="dashicons dashicons-star-filled"></span>
+<span  class="dashicons dashicons-star-filled"></span>
+`;
         ?>
         <div id="embedpress-settings-wrapper">
             <header>
@@ -194,152 +159,108 @@ class Settings
                         EmbedPress
                     </a>
                 </h1>
+                <div class="embedpress-version-name">
+                    <span class="free"> <?php esc_html_e("Core Version: ", "embedpress"); echo EMBEDPRESS_VERSION; ?></span>
+                    <?php if ( defined( 'EMBEDPRESS_PRO_PLUGIN_VERSION' ) ) { ?>
+                        <span class="pro"> <?php esc_html_e("Pro Version: ", "embedpress"); echo EMBEDPRESS_PRO_PLUGIN_VERSION; ?></span>
+                    <?php } ?>
+                </div>
             </header>
 
             <?php settings_errors(); ?>
-
             <div>
                 <h2 class="nav-tab-wrapper">
-                    <a href="?page=embedpress"
-                       class="nav-tab<?php echo $activeTab === 'embedpress' || empty($activeTab) ? ' nav-tab-active' : ''; ?> ">
-                        General settings
-                    </a>
-
-                    <?php do_action('embedpress:settings:render:tab', $activeTab); ?>
-
-                    <a href="?page=embedpress&tab=addons"
-                       class="nav-tab<?php echo $activeTab === 'addons' ? ' nav-tab-active' : ''; ?> ">
-                        Add-ons
-                    </a>
+                    <?php if ( !defined( 'EMBEDPRESS_PRO_PLUGIN_VERSION' ) ): ?>
+                        <a href="?page=embedpress&tab=embedpress_get_pro"
+                           class="nav-tab<?php echo $is_upgrade_tab_active ? ' nav-tab-active' : ''; ?> ">
+	                        <?php esc_html_e( 'Go Premium', 'embedpress'); ?>
+                        </a>
+                    <?php endif; ?>
+                    <?php do_action( 'embedpress:settings:render:tab', $activeTab ); ?>
+                    <?php do_action( 'embedpress_license_tab', $activeTab ); ?>
                 </h2>
 
-                <?php if ($activeTab !== 'addons') : ?>
+                <?php if ( $activeTab !== 'addons' ) : ?>
                     <form action="options.php" method="POST" style="padding-bottom: 20px;">
-                        <?php settings_fields($settingsFieldsIdentifier); ?>
-                        <?php do_settings_sections($settingsSectionsIdentifier); ?>
+                        <?php settings_fields( $settingsFieldsIdentifier ); ?>
+                        <?php do_settings_sections( $settingsSectionsIdentifier ); ?>
+                        <?php if ( !$is_license_tab_active  && !$is_upgrade_tab_active ) {
+                            ?>
+                                <button type="submit" class="button button-primary embedpress-setting-save"><?php esc_html_e( 'Save Changes', 'embedpress'); ?>
+                                </button>
+                        <?php } ?>
 
-                        <button type="submit" class="button button-primary">Save changes</button>
                     </form>
                 <?php endif; ?>
-
-                <?php if ($activeTab === 'addons') : ?>
-                    <?php
-                    $icons_base_path = plugins_url('embedpress') . '/assets/images/';
-
-                    $addons = [
-                        'embedpress-youtube' => [
-                            'title'       => __('The YouTube Add-on for EmbedPress', 'embedpress'),
-                            'description' => __('Get more features for your YouTube embeds in WordPress.',
-                                'embedpress'),
-                            'available'   => true,
-                            'installed'   => static::is_plugin_installed('embedpress-youtube'),
-                            'active'      => static::is_plugin_active('embedpress-youtube'),
-                        ],
-                        'embedpress-vimeo'   => [
-                            'title'       => __('The Vimeo Add-on for EmbedPress', 'embedpress'),
-                            'description' => __('Get more features for your Vimeo embeds in WordPress.', 'embedpress'),
-                            'available'   => true,
-                            'installed'   => static::is_plugin_installed('embedpress-vimeo'),
-                            'active'      => static::is_plugin_active('embedpress-vimeo'),
-                        ],
-                        'embedpress-wistia'  => [
-                            'title'       => __('The Wistia Add-on for EmbedPress', 'embedpress'),
-                            'description' => __('Get more features for your Wistia embeds in WordPress.', 'embedpress'),
-                            'available'   => true,
-                            'installed'   => static::is_plugin_installed('embedpress-wistia'),
-                            'active'      => static::is_plugin_active('embedpress-wistia'),
-                        ],
-                    ];
-
-                    $args = [
-                        'addons'          => $addons,
-                        'icons_base_path' => $icons_base_path,
-                        'labels'          => [
-                            'active'         => __('Active', 'publishpress'),
-                            'installed'      => __('Installed', 'publishpress'),
-                            'get_pro_addons' => __('Get Pro Add-ons!', 'publishpress'),
-                            'coming_soon'    => __('Coming soon', 'publishpress'),
-                        ],
-                    ];
-
-                    ?>
-                    <div class="ep-module-settings">
-                        <ul class="ep-block-addons-items">
-                            <?php foreach ($addons as $name => $addon): ?>
-                                <li class="ep-block-addons-item ">
-                                    <img src="<?php echo $icons_base_path . $name; ?>.jpg">
-                                    <h3><?php echo $addon['title']; ?></h3>
-                                    <p><?php echo $addon['description']; ?></p>
-
-                                    <?php if ($addon['available']): ?>
-                                        <?php if ($addon['installed']): ?>
-                                            <?php if ($addon['active']): ?>
-                                                <div>
-                                                    <span class="dashicons dashicons-yes"></span><span><?php echo __('Active',
-                                                            'embedpress'); ?></span>
-                                                </div>
-                                            <?php else: ?>
-                                                <div>
-                                                    <span><?php echo __('Installed', 'embedpress'); ?></span>
-                                                </div>
-                                            <?php endif; ?>
-                                        <?php else: ?>
-                                            <a href="https://embedpress.com/embedpress-addons/"
-                                               class="button button-primary">
-                                                <span class="dashicons dashicons-cart"></span> <?php echo __('Get Pro Add-ons!',
-                                                    'embedpress'); ?>
-                                            </a>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <div><?php echo __('Coming soon', 'embedpress'); ?></div>
-                                    <?php endif; ?>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
+                <?php if ( $is_license_tab_active ) : ?>
+                    <?php do_action( 'embedpress_license' ); ?>
+                <?php endif; ?>
+                <?php if ( $is_upgrade_tab_active ) : ?>
+                    <div class=" embedpress-go-premium">
+                        <div class="embedpress-col-half">
+                            <div class="embedpress-admin-block-wrapper">
+                                <div class="embedpress-admin-block embedpress-admin-block-docs">
+                                    <header class="embedpress-admin-block-header">
+                                        <div class="embedpress-admin-block-header-icon">
+                                            <img src="<?php echo plugins_url( 'assets/images/icon-why-premium.svg',
+                                                EMBEDPRESS_PLUGIN_BASENAME ); ?>" alt="embedpress-go-pro">
+                                        </div>
+                                        <h4 class="embedpress-admin-title"><?php esc_html_e( 'Why upgrade to Premium Version?', 'embedpress'); ?></h4>
+                                    </header>
+                                    <div class="embedpress-admin-block-content">
+                                        <p><?php esc_html_e( 'The premium version helps us to continue development of the product
+                                            incorporating even more features and enhancements.', 'embedpress'); ?></p>
+                                        <p><?php esc_html_e( 'You will also get world class support from our dedicated team, 24/7.', 'embedpress'); ?></p>
+                                        <a href="https://wpdeveloper.net/plugins/embedpress#pricing" target="_blank"
+                                           class="button embedpress-btn"><?php esc_html_e( 'Get Pro Version', 'embedpress'); ?></a>
+                                    </div>
+                                </div>
+                            </div><!--admin block-wrapper end-->
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
 
             <footer>
                 <p>
-                    <a href="//wordpress.org/support/plugin/embedpress/reviews/#new-post" target="_blank"
-                       rel="noopener noreferrer">If you like <strong>EmbedPress</strong> please leave us a <span
-                                class="dashicons dashicons-star-filled"></span><span
-                                class="dashicons dashicons-star-filled"></span><span
-                                class="dashicons dashicons-star-filled"></span><span
-                                class="dashicons dashicons-star-filled"></span><span
-                                class="dashicons dashicons-star-filled"></span> rating. Thank you!</a>
+                    <a href="//embedpress.com/go/review-ep" target="_blank"
+                       rel="noopener noreferrer">
+                        <?php
+                        /* translators: 1: EmbedPress Plugin Name, 2: 5 stars. */
+                        printf( __('If you like %1$s please leave us a 5 stars %2$s
+                         rating. Thank you!', 'embedpress'), '<strong>EmbedPress</strong>', $five_stars ) ?>
+                    </a>
                 </p>
                 <hr>
                 <nav>
                     <ul>
                         <li>
                             <a href="//embedpress.com" target="_blank" rel="noopener noreferrer"
-                               title="About EmbedPress">About</a>
+                               title="About EmbedPress"><?php esc_html_e( 'About', 'embedpress'); ?></a>
                         </li>
                         <li>
-                            <a href="//embedpress.com/docs/sources-support" target="_blank" rel="noopener noreferrer"
-                               title="List of supported sources by EmbedPress">Supported sources</a>
+                            <a href="//embedpress.com/sources/" target="_blank" rel="noopener noreferrer"
+                               title="List of supported sources by EmbedPress"><?php esc_html_e( 'Supported Sources', 'embedpress'); ?></a>
                         </li>
                         <li>
-                            <a href="//embedpress.com/docs" target="_blank" rel="noopener noreferrer"
-                               title="EmbedPress Documentation">Documentation</a>
+                            <a href="//embedpress.com/documentation/" target="_blank" rel="noopener noreferrer"
+                               title="EmbedPress Documentation"><?php esc_html_e( 'Documentation', 'embedpress'); ?></a>
                         </li>
                         <li>
-                            <a href="//embedpress.com/addons/" target="_blank" rel="noopener noreferrer"
-                               title="EmbedPress Add-Ons">Add-Ons</a>
+                            <a href="//embedpress.com/#pricing" target="_blank" rel="noopener noreferrer"
+                               title="Get EmbedPress Pro"><?php esc_html_e( 'Get EmbedPress Pro', 'embedpress'); ?></a>
                         </li>
                         <li>
-                            <a href="//embedpress.com/contact" target="_blank" rel="noopener noreferrer"
-                               title="Contact the EmbedPress team">Contact</a>
+                            <a href="//embedpress.com/support/" target="_blank" rel="noopener noreferrer"
+                               title="Contact the EmbedPress team"><?php esc_html_e( 'Contact', 'embedpress'); ?></a>
                         </li>
                         <li>
-                            <a href="//twitter.com/embedpress" target="_blank" rel="noopener noreferrer">
+                            <a href="//twitter.com/wpdevteam" target="_blank" rel="noopener noreferrer">
                                 <span class="dashicons dashicons-twitter"></span>
                             </a>
                         </li>
                         <li>
-                            <a href="//facebook.com/embedpress" target="_blank" rel="noopener noreferrer">
+                            <a href="//www.facebook.com/WPDeveloperNet/" target="_blank" rel="noopener noreferrer">
                                 <span class="dashicons dashicons-facebook"></span>
                             </a>
                         </li>
@@ -347,258 +268,12 @@ class Settings
                 </nav>
                 <p>
                     <a href="//embedpress.com" target="_blank" rel="noopener noreferrer">
-                        <img width="100" src="//embedpress.com/wp-content/uploads/2018/01/ep-logo-2.png">
+                        <img width="100" alt="embedpress logo" src="<?php echo plugins_url( 'assets/images/embedpress.png',
+                            EMBEDPRESS_PLUGIN_BASENAME ); ?>">
                     </a>
                 </p>
             </footer>
         </div>
         <?php
-    }
-
-    /**
-     * Method that validates the form data.
-     *
-     * @since   1.0.0
-     * @static
-     *
-     * @param   mixed $freshData Data received from the form.
-     *
-     * @return  array
-     */
-    public static function validateForm($freshData)
-    {
-        $data = [
-            'enablePluginInAdmin' => isset($freshData['enablePluginInAdmin']) ? (bool)$freshData['enablePluginInAdmin'] : true,
-            'enablePluginInFront' => isset($freshData['enablePluginInFront']) ? (bool)$freshData['enablePluginInFront'] : true,
-            'fbLanguage'          => $freshData['fbLanguage'],
-        ];
-
-        return $data;
-    }
-
-    /**
-     * Method that renders the enablePluginInAdmin input.
-     *
-     * @since   1.0.0
-     * @static
-     */
-    public static function renderField_enablePluginInAdmin()
-    {
-        $fieldName = "enablePluginInAdmin";
-
-        $options = get_option(self::$sectionGroupIdentifier);
-
-        $options[$fieldName] = ! isset($options[$fieldName]) ? true : (bool)$options[$fieldName];
-
-        echo '<label><input type="radio" id="' . $fieldName . '_0" name="' . self::$sectionGroupIdentifier . '[' . $fieldName . ']" value="0" ' . (! $options[$fieldName] ? "checked" : "") . ' /> No</label>';
-        echo "&nbsp;&nbsp;";
-        echo '<label><input type="radio" id="' . $fieldName . '_1" name="' . self::$sectionGroupIdentifier . '[' . $fieldName . ']" value="1" ' . ($options[$fieldName] ? "checked" : "") . ' /> Yes</label>';
-        echo '<p class="description">Do you want EmbedPress to run here in the admin area? Disabling this <strong>will not</strong> affect your frontend embeds.</p>';
-    }
-
-    /**
-     * Method that renders the enablePluginInFront input.
-     *
-     * @since   1.6.0
-     * @static
-     */
-    public static function renderField_enablePluginInFront()
-    {
-        $fieldName = "enablePluginInFront";
-
-        $options = get_option(self::$sectionGroupIdentifier);
-
-        $options[$fieldName] = ! isset($options[$fieldName]) ? true : (bool)$options[$fieldName];
-
-        echo '<label><input type="radio" id="' . $fieldName . '_0" name="' . self::$sectionGroupIdentifier . '[' . $fieldName . ']" value="0" ' . (! $options[$fieldName] ? "checked" : "") . ' /> No</label>';
-        echo "&nbsp;&nbsp;";
-        echo '<label><input type="radio" id="' . $fieldName . '_1" name="' . self::$sectionGroupIdentifier . '[' . $fieldName . ']" value="1" ' . ($options[$fieldName] ? "checked" : "") . ' /> Yes</label>';
-        echo '<p class="description">Do you want EmbedPress to run within editors in frontend (if there\'s any)? Disabling this <strong>will not</strong> affect embeds seem by your regular users in frontend.</p>';
-    }
-
-    /**
-     * Method that renders the forceFacebookLanguage input.
-     *
-     * @since   1.3.0
-     * @static
-     */
-    public static function renderField_forceFacebookLanguage()
-    {
-        $fieldName = "fbLanguage";
-
-        $options = get_option(self::$sectionGroupIdentifier);
-
-        $options[$fieldName] = ! isset($options[$fieldName]) ? "" : $options[$fieldName];
-
-        $facebookLocales = self::getFacebookAvailableLocales();
-
-        echo '<select name="' . self::$sectionGroupIdentifier . '[' . $fieldName . ']">';
-        echo '<option value="0">Automatic (by Facebook)</option>';
-        echo '<optgroup label="Available">';
-        foreach ($facebookLocales as $locale => $localeName) {
-            echo '<option value="' . $locale . '"' . ($options[$fieldName] === $locale ? ' selected' : '') . '>' . $localeName . '</option>';
-        }
-        echo '</optgroup>';
-        echo '</select>';
-
-        echo '<p class="description">Sometimes Facebook can choose the wrong language for embeds. If this happens, choose the correct language here.</p>';
-    }
-
-    /**
-     * Returns a list of locales that can be used on Facebook embeds.
-     *
-     * @since   1.3.0
-     * @static
-     *
-     * @return  array
-     */
-    public static function getFacebookAvailableLocales()
-    {
-        $locales = [
-            'af_ZA' => "Afrikaans",
-            'ak_GH' => "Akan",
-            'am_ET' => "Amharic",
-            'ar_AR' => "Arabic",
-            'as_IN' => "Assamese",
-            'ay_BO' => "Aymara",
-            'az_AZ' => "Azerbaijani",
-            'be_BY' => "Belarusian",
-            'bg_BG' => "Bulgarian",
-            'bn_IN' => "Bengali",
-            'br_FR' => "Breton",
-            'bs_BA' => "Bosnian",
-            'ca_ES' => "Catalan",
-            'cb_IQ' => "Sorani Kurdish",
-            'ck_US' => "Cherokee",
-            'co_FR' => "Corsican",
-            'cs_CZ' => "Czech",
-            'cx_PH' => "Cebuano",
-            'cy_GB' => "Welsh",
-            'da_DK' => "Danish",
-            'de_DE' => "German",
-            'el_GR' => "Greek",
-            'en_GB' => "English (UK)",
-            'en_IN' => "English (India)",
-            'en_PI' => "English (Pirate)",
-            'en_UD' => "English (Upside Down)",
-            'en_US' => "English (US)",
-            'eo_EO' => "Esperanto",
-            'es_CL' => "Spanish (Chile)",
-            'es_CO' => "Spanish (Colombia)",
-            'es_ES' => "Spanish (Spain)",
-            'es_LA' => "Spanish",
-            'es_MX' => "Spanish (Mexico)",
-            'es_VE' => "Spanish (Venezuela)",
-            'et_EE' => "Estonian",
-            'eu_ES' => "Basque",
-            'fa_IR' => "Persian",
-            'fb_LT' => "Leet Speak",
-            'ff_NG' => "Fulah",
-            'fi_FI' => "Finnish",
-            'fo_FO' => "Faroese",
-            'fr_CA' => "French (Canada)",
-            'fr_FR' => "French (France)",
-            'fy_NL' => "Frisian",
-            'ga_IE' => "Irish",
-            'gl_ES' => "Galician",
-            'gn_PY' => "Guarani",
-            'gu_IN' => "Gujarati",
-            'gx_GR' => "Classical Greek",
-            'ha_NG' => "Hausa",
-            'he_IL' => "Hebrew",
-            'hi_IN' => "Hindi",
-            'hr_HR' => "Croatian",
-            'ht_HT' => "Haitian Creole",
-            'hu_HU' => "Hungarian",
-            'hy_AM' => "Armenian",
-            'id_ID' => "Indonesian",
-            'ig_NG' => "Igbo",
-            'is_IS' => "Icelandic",
-            'it_IT' => "Italian",
-            'ja_JP' => "Japanese",
-            'ja_KS' => "Japanese (Kansai)",
-            'jv_ID' => "Javanese",
-            'ka_GE' => "Georgian",
-            'kk_KZ' => "Kazakh",
-            'km_KH' => "Khmer",
-            'kn_IN' => "Kannada",
-            'ko_KR' => "Korean",
-            'ku_TR' => "Kurdish (Kurmanji)",
-            'ky_KG' => "Kyrgyz",
-            'la_VA' => "Latin",
-            'lg_UG' => "Ganda",
-            'li_NL' => "Limburgish",
-            'ln_CD' => "Lingala",
-            'lo_LA' => "Lao",
-            'lt_LT' => "Lithuanian",
-            'lv_LV' => "Latvian",
-            'mg_MG' => "Malagasy",
-            'mi_NZ' => "Māori",
-            'mk_MK' => "Macedonian",
-            'ml_IN' => "Malayalam",
-            'mn_MN' => "Mongolian",
-            'mr_IN' => "Marathi",
-            'ms_MY' => "Malay",
-            'mt_MT' => "Maltese",
-            'my_MM' => "Burmese",
-            'nb_NO' => "Norwegian (bokmal)",
-            'nd_ZW' => "Ndebele",
-            'ne_NP' => "Nepali",
-            'nl_BE' => "Dutch (België)",
-            'nl_NL' => "Dutch",
-            'nn_NO' => "Norwegian (nynorsk)",
-            'ny_MW' => "Chewa",
-            'or_IN' => "Oriya",
-            'pa_IN' => "Punjabi",
-            'pl_PL' => "Polish",
-            'ps_AF' => "Pashto",
-            'pt_BR' => "Portuguese (Brazil)",
-            'pt_PT' => "Portuguese (Portugal)",
-            'qc_GT' => "Quiché",
-            'qu_PE' => "Quechua",
-            'rm_CH' => "Romansh",
-            'ro_RO' => "Romanian",
-            'ru_RU' => "Russian",
-            'rw_RW' => "Kinyarwanda",
-            'sa_IN' => "Sanskrit",
-            'sc_IT' => "Sardinian",
-            'se_NO' => "Northern Sámi",
-            'si_LK' => "Sinhala",
-            'sk_SK' => "Slovak",
-            'sl_SI' => "Slovenian",
-            'sn_ZW' => "Shona",
-            'so_SO' => "Somali",
-            'sq_AL' => "Albanian",
-            'sr_RS' => "Serbian",
-            'sv_SE' => "Swedish",
-            'sw_KE' => "Swahili",
-            'sy_SY' => "Syriac",
-            'sz_PL' => "Silesian",
-            'ta_IN' => "Tamil",
-            'te_IN' => "Telugu",
-            'tg_TJ' => "Tajik",
-            'th_TH' => "Thai",
-            'tk_TM' => "Turkmen",
-            'tl_PH' => "Filipino",
-            'tl_ST' => "Klingon",
-            'tr_TR' => "Turkish",
-            'tt_RU' => "Tatar",
-            'tz_MA' => "Tamazight",
-            'uk_UA' => "Ukrainian",
-            'ur_PK' => "Urdu",
-            'uz_UZ' => "Uzbek",
-            'vi_VN' => "Vietnamese",
-            'wo_SN' => "Wolof",
-            'xh_ZA' => "Xhosa",
-            'yi_DE' => "Yiddish",
-            'yo_NG' => "Yoruba",
-            'zh_CN' => "Simplified Chinese (China)",
-            'zh_HK' => "Traditional Chinese (Hong Kong)",
-            'zh_TW' => "Traditional Chinese (Taiwan)",
-            'zu_ZA' => "Zulu",
-            'zz_TR' => "Zazaki",
-        ];
-
-        return $locales;
     }
 }

@@ -9,12 +9,43 @@ namespace EmbedPress\Plugins\Html;
  *
  * @package     EmbedPress
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.4.0
  */
 class Field
 {
+	/**
+	 * Generates a number type input.
+	 *
+	 * @param $value
+	 *
+	 * @return  string
+	 * @since   2.7.5
+	 * @access  protected
+	 * @static
+	 */
+	protected static function number($value)
+	{
+		return '<input type="number" name="embedpress:{{slug}}[{{name}}]" class="{{classes}}" placeholder="{{placeholder}}" value="' . (int)$value . '">';
+
+	}
+
+	/**
+	 * Generates a url type input.
+	 *
+	 * @param $value
+	 *
+	 * @return  string
+	 * @since   2.7.5
+	 * @access  protected
+	 * @static
+	 */
+	protected static function url($value)
+	{
+		return '<input type="url" name="embedpress:{{slug}}[{{name}}]" class="{{classes}}" placeholder="{{placeholder}}" value="' . (string)$value . '">';
+
+	}
     /**
      * Generates a text type input.
      *
@@ -26,9 +57,7 @@ class Field
      */
     protected static function text($value)
     {
-        $html = '<input type="text" name="embedpress:{{slug}}[{{name}}]" class="{{classes}}" placeholder="{{placeholder}}" value="' . (string)$value . '">';
-
-        return $html;
+	    return '<input type="text" name="embedpress:{{slug}}[{{name}}]" class="{{classes}}" placeholder="{{placeholder}}" value="' . (string)$value . '">';
     }
 
     /**
@@ -42,9 +71,7 @@ class Field
      */
     protected static function textarea($value)
     {
-        $html = '<textarea name="embedpress:{{slug}}[{{name}}]" class="{{classes}}" placeholder="{{placeholder}}">' . (string)$value . '</textarea>';
-
-        return $html;
+	    return '<textarea name="embedpress:{{slug}}[{{name}}]" class="{{classes}}" placeholder="{{placeholder}}">' . (string)$value . '</textarea>';
     }
 
     /**
@@ -67,9 +94,7 @@ class Field
             $html[] = '</label>&nbsp;&nbsp;';
         }
 
-        $html = implode('', $html);
-
-        return $html;
+        return implode('', $html);
     }
 
     /**
@@ -91,9 +116,7 @@ class Field
 
         $html[] = '</select>';
 
-        $html = implode('', $html);
-
-        return $html;
+        return implode('', $html);
     }
 
     /**
@@ -132,6 +155,10 @@ class Field
             $html = self::select((array)$field->options, (string)$value);
         } elseif (in_array($field->type, ['textarea'])) {
             $html = self::textarea((string)$value);
+        } elseif (in_array($field->type, ['number', 'NUMBER'])) {
+	        $html = self::number((int)$value);
+        } elseif (in_array($field->type, ['url', 'link'])) {
+	        $html = self::url($value);
         } else {
             $html = self::text((string)$value);
         }
@@ -144,51 +171,6 @@ class Field
             $html);
 
         $html .= wp_nonce_field("{$pluginSlug}:nonce", "{$pluginSlug}:nonce");
-
-        if ($field->slug === "license_key") {
-            $licenseStatusClass   = "ep-label-danger";
-            $currentLicenseStatus = isset($options['license']['status']) ? trim(strtoupper($options['license']['status'])) : "";
-            switch ($currentLicenseStatus) {
-                case '':
-                    $licenseStatusMessage = "Missing license";
-                    break;
-                case 'EXPIRED':
-                    $licenseStatusMessage = "Your license key is expired";
-                    break;
-                case 'REVOKED':
-                    $licenseStatusMessage = "Your license key has been disabled";
-                    break;
-                case 'MISSING':
-                case 'INVALID':
-                    $licenseStatusMessage = "Invalid license";
-                    break;
-                case 'SITE_INACTIVE':
-                    $licenseStatusMessage = "Your license is not active for this URL";
-                    break;
-                case 'ITEM_NAME_MISMATCH':
-                    $licenseStatusMessage = "This appears to be an invalid license key for this product";
-                    break;
-                case 'NO_ACTIVATIONS_LEFT':
-                    $licenseStatusMessage = "Your license key has reached its activation limit";
-                    break;
-                case 'VALID':
-                    $licenseStatusClass   = "ep-label-success";
-                    $licenseStatusMessage = "Activated";
-                    break;
-                default:
-                    $licenseStatusMessage = "Not validated yet";
-                    break;
-            }
-
-            $html .= '<br/><br/><strong>Status: <span class="' . $licenseStatusClass . '">' . __($licenseStatusMessage) . '</span>.</strong><br/><br/>';
-
-            if ( ! (isset($options['license']['status']) && $options['license']['status'] === 'valid')) {
-                $html .= '<a href="' . EMBEDPRESS_LICENSES_MORE_INFO_URL . '" target="_blank" class="ep-small-link ep-small-spacing" rel="noopener noreferrer" style="display: inline-block; margin-left: 20px;" title="' . __('Click here to read more about licenses.') . '">' . __('More information') . '</a>';
-                $html .= '<br/><br/>';
-            }
-
-            $html .= '<hr>';
-        }
 
         if ( ! empty($field->description)) {
             $html .= '<br/>';

@@ -7,7 +7,7 @@ use EmbedPress\Ends\Handler as EndHandlerAbstract;
 use EmbedPress\Shortcode;
 use Embera\Embera;
 
-(defined('ABSPATH') && defined('EMBEDPRESS_IS_LOADED')) or die("No direct script access allowed.");
+(defined( 'ABSPATH' ) && defined( 'EMBEDPRESS_IS_LOADED' )) or die( "No direct script access allowed." );
 
 /**
  * The admin-facing functionality of the plugin.
@@ -16,32 +16,32 @@ use Embera\Embera;
  * @package     EmbedPress
  * @subpackage  EmbedPress/Ends/Back
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2018 EmbedPress. All rights reserved.
- * @license     GPLv2 or later
+ * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @license     GPLv3 or later
  * @since       1.0.0
  */
-class Handler extends EndHandlerAbstract
-{
+class Handler extends EndHandlerAbstract {
     /**
      * Method that register all scripts for the admin area.
      *
+     * @return  void
      * @since   1.0.0
      *
-     * @return  void
      */
-    public function enqueueScripts()
-    {
+    public function enqueueScripts() {
         $plgSettings = Core::getSettings();
 
-        $urlSchemes = apply_filters('embedpress:getAdditionalURLSchemes', $this->getUrlSchemes());
-
-        wp_enqueue_script("bootbox-bootstrap", EMBEDPRESS_URL_ASSETS . 'js/vendor/bootstrap/bootstrap.min.js',
-            ['jquery'], $this->pluginVersion, true);
-        wp_enqueue_script("bootbox", EMBEDPRESS_URL_ASSETS . 'js/vendor/bootbox.min.js',
-            ['jquery', 'bootbox-bootstrap'], $this->pluginVersion, true);
-        wp_enqueue_script($this->pluginName, EMBEDPRESS_URL_ASSETS . 'js/preview.js', ['jquery', 'bootbox'],
-            $this->pluginVersion, true);
-        wp_localize_script($this->pluginName, '$data', [
+        $urlSchemes = apply_filters( 'embedpress:getAdditionalURLSchemes', $this->getUrlSchemes() );
+		
+		wp_enqueue_script( 'embedpress-pdfobject', EMBEDPRESS_URL_ASSETS . 'js/pdfobject.min.js', [],
+            $this->pluginVersion, false );
+        wp_enqueue_script( "bootbox-bootstrap", EMBEDPRESS_URL_ASSETS . 'js/vendor/bootstrap/bootstrap.min.js',
+            [ 'jquery' ], $this->pluginVersion, false );
+        wp_enqueue_script( "bootbox", EMBEDPRESS_URL_ASSETS . 'js/vendor/bootbox.min.js',
+            [ 'jquery', 'bootbox-bootstrap' ], $this->pluginVersion, true );
+        wp_enqueue_script( $this->pluginName, EMBEDPRESS_URL_ASSETS . 'js/preview.js', [ 'jquery', 'bootbox' ],
+            $this->pluginVersion, true );
+        wp_localize_script( $this->pluginName, '$data', [
             'previewSettings'       => [
                 'baseUrl'    => get_site_url() . '/',
                 'versionUID' => $this->pluginVersion,
@@ -50,17 +50,28 @@ class Handler extends EndHandlerAbstract
             'EMBEDPRESS_SHORTCODE'  => EMBEDPRESS_SHORTCODE,
             'EMBEDPRESS_URL_ASSETS' => EMBEDPRESS_URL_ASSETS,
             'urlSchemes'            => $urlSchemes,
-        ]);
+        ] );
+
+        //load embedpress admin js
+
+        wp_enqueue_script( 'embedpress-admin', EMBEDPRESS_URL_ASSETS . 'js/admin.js', [ 'jquery' ],
+            $this->pluginVersion, true );
+		
+        wp_localize_script( $this->pluginName, 'EMBEDPRESS_ADMIN_PARAMS', [
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce'   => wp_create_nonce('embedpress')
+        ] );
+
 
         $installedPlugins = Core::getPlugins();
-        if (count($installedPlugins) > 0) {
-            foreach ($installedPlugins as $plgSlug => $plgNamespace) {
+        if ( count( $installedPlugins ) > 0 ) {
+            foreach ( $installedPlugins as $plgSlug => $plgNamespace ) {
                 $plgScriptPathRelative = "assets/js/embedpress.{$plgSlug}.js";
                 $plgName               = "embedpress-{$plgSlug}";
 
-                if (file_exists(WP_PLUGIN_DIR . "/{$plgName}/{$plgScriptPathRelative}")) {
-                    wp_enqueue_script($plgName, plugins_url($plgName) . '/' . $plgScriptPathRelative,
-                        [$this->pluginName], $this->pluginVersion, true);
+                if ( file_exists( WP_PLUGIN_DIR . "/{$plgName}/{$plgScriptPathRelative}" ) ) {
+                    wp_enqueue_script( $plgName, plugins_url( $plgName ) . '/' . $plgScriptPathRelative,
+                        [ $this->pluginName ], $this->pluginVersion, true );
                 }
             }
         }
@@ -69,34 +80,32 @@ class Handler extends EndHandlerAbstract
     /**
      * Method that register all stylesheets for the admin area.
      *
+     * @return  void
      * @since   1.0.0
      * @static
      *
-     * @return  void
      */
-    public static function enqueueStyles()
-    {
-        wp_enqueue_style('embedpress-admin', plugins_url('embedpress/assets/css/admin.css'));
-        wp_enqueue_style('embedpress-addons', plugins_url('embedpress/assets/css/addons.css'));
+    public static function enqueueStyles() {
+        wp_enqueue_style( 'embedpress-admin', plugins_url( 'embedpress/assets/css/admin.css' ) );
+        wp_enqueue_style( 'embedpress-addons', plugins_url( 'embedpress/assets/css/addons.css' ) );
     }
 
     /**
      * Method that receive a string via AJAX and return the decoded-shortcoded-version of that string.
      *
+     * @return  void
      * @since   1.0.0
      *
-     * @return  void
      */
-    public function doShortcodeReceivedViaAjax()
-    {
-        $subject = isset($_POST['subject']) ? $_POST['subject'] : "";
+    public function doShortcodeReceivedViaAjax() {
+        $subject = isset( $_POST['subject'] ) ? $_POST['subject'] : "";
 
         $response = [
-            'data' => Shortcode::parseContent($subject, true),
+            'data' => Shortcode::parseContent( $subject, true ),
         ];
 
-        header('Content-Type:application/json;charset=UTF-8');
-        echo json_encode($response);
+        header( 'Content-Type:application/json;charset=UTF-8' );
+        echo json_encode( $response );
 
         exit();
     }
@@ -104,38 +113,36 @@ class Handler extends EndHandlerAbstract
     /**
      * Method that receive an url via AJAX and return the info about that url/embed.
      *
+     * @return  void
      * @since   1.0.0
      *
-     * @return  void
      */
-    public function getUrlInfoViaAjax()
-    {
-        $url = isset($_GET['url']) ? trim($_GET['url']) : "";
+    public function getUrlInfoViaAjax() {
+        $url = isset( $_GET['url'] ) ? trim( $_GET['url'] ) : "";
 
         $response = [
             'url'             => $url,
             'canBeResponsive' => false,
         ];
 
-        if ( ! ! strlen($response['url'])) {
-            $embera = new Embera();
+        if ( !!strlen( $response['url'] ) ) {
 
             $additionalServiceProviders = Core::getAdditionalServiceProviders();
-            if ( ! empty($additionalServiceProviders)) {
-                foreach ($additionalServiceProviders as $serviceProviderClassName => $serviceProviderUrls) {
-                    Shortcode::addServiceProvider($serviceProviderClassName, $serviceProviderUrls, $embera);
+            if ( !empty( $additionalServiceProviders ) ) {
+                foreach ( $additionalServiceProviders as $serviceProviderClassName => $serviceProviderUrls ) {
+                    Shortcode::addServiceProvider( $serviceProviderClassName, $serviceProviderUrls );
                 }
             }
+            $embera = new Embera([], Shortcode::get_collection());
 
-            $urlInfo = $embera->getUrlInfo($response['url']);
-            if (isset($urlInfo[$response['url']])) {
-                $urlInfo                     = (object)$urlInfo[$response['url']];
-                $response['canBeResponsive'] = Core::canServiceProviderBeResponsive($urlInfo->provider_alias);
+            $urlInfo = $embera->getUrlData( $response['url'] );
+            if ( isset( $urlInfo[$response['url']] ) && $urlInfo[$response['url']]['provider_name'] ) {
+                $response['canBeResponsive'] = Core::canServiceProviderBeResponsive( strtolower( $urlInfo[$response['url']]['provider_name']) );
             }
         }
 
-        header('Content-Type:application/json;charset=UTF-8');
-        echo json_encode($response);
+        header( 'Content-Type:application/json;charset=UTF-8' );
+        echo json_encode( $response );
 
         exit();
     }
@@ -145,8 +152,7 @@ class Handler extends EndHandlerAbstract
      *
      * @return array
      */
-    public function getUrlSchemes()
-    {
+    public function getUrlSchemes() {
         return [
             // PollDaddy
             '*.polldaddy.com/s/*',
@@ -328,6 +334,7 @@ class Handler extends EndHandlerAbstract
 
             // Infogram (https://infogr.am/)
             'infogr.am/*',
+            'infogram.com/*',
 
             // ChartBlocks (http://www.chartblocks.com/)
             'public.chartblocks.com/c/*',
@@ -413,5 +420,15 @@ class Handler extends EndHandlerAbstract
             '*.wistia.com/medias/*',
             'fast.wistia.com/embed/medias/*.jsonp',
         ];
+    }
+
+    /**
+     * Update admin notice view status
+     *
+     * @since  2.5.1
+     */
+    public static function embedpress_notice_dismiss() {
+        check_ajax_referer( 'embedpress', 'security' );
+        update_option( 'embedpress_social_dismiss_notice', true );
     }
 }
